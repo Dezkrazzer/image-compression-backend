@@ -46,7 +46,7 @@ def compress_image_pca(image_bytes: bytes, k: int) -> dict:
     # Konversi array numpy kembali menjadi gambar JPEG
     compressed_img = Image.fromarray(compressed_array)
     img_byte_arr = io.BytesIO()
-    compressed_img.save(img_byte_arr, format='JPEG', quality=95)
+    compressed_img.save(img_byte_arr, format='JPEG', quality=85, optimize=True)
     compressed_bytes = img_byte_arr.getvalue()
     
     process_time = time.time() - start_time
