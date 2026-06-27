@@ -4,6 +4,8 @@ import io
 import time
 import base64
 import torch
+import rawpy  # Engine khusus untuk RAW formats
+from pillow_heif import register_heif_opener  # Support HEIC/HEIF
 
 # Deteksi hardware secara dinamis: CUDA (NVIDIA), MPS (Apple Silicon), atau CPU (Multicore x86/AMD)
 device = torch.device('cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu')
@@ -15,14 +17,25 @@ def compress_image_pca(image_bytes: bytes, k: int) -> dict:
         raise ValueError("Components must be greater than or equal to 1.")
 
     start_time = time.time()
+    bytes_io = io.BytesIO(image_bytes)
     
     try:
-        # Buka gambar menggunakan Pillow dan konversi ke RGB
-        with Image.open(io.BytesIO(image_bytes)) as source_img:
+        # Tahap 1: Coba buka dengan Pillow (support JPG, PNG, WEBP, TIFF, BMP, HEIC, dll)
+        with Image.open(bytes_io) as source_img:
             img = source_img.convert('RGB')
-    except UnidentifiedImageError as exc:
-        raise ValueError("Uploaded file is not a valid image.") from exc
-
+            img_array = np.array(img)
+            
+    except UnidentifiedImageError:
+        # Tahap 2: Kalau Pillow nyerah, reset buffer memory dan lempar ke RawPy
+        try:
+            bytes_io.seek(0)
+            with rawpy.imread(bytes_io) as raw:
+                # postprocess() akan otomatis merender RAW mentah jadi matriks RGB NumPy
+                img_array = raw.postprocess() 
+        except Exception as exc:
+            # Kalau RawPy juga ikut nyerah, file-nya emang bodong/corrupt
+            raise ValueError("Uploaded file is not a valid or supported image format (including RAW).") from exc
+        
     img_array = np.array(img)
     h, w, c = img_array.shape
     
