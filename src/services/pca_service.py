@@ -8,6 +8,8 @@ import torch
 # Deteksi hardware secara dinamis: CUDA (NVIDIA), MPS (Apple Silicon), atau CPU (Multicore x86/AMD)
 device = torch.device('cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu')
 
+@torch.compile
+
 def compress_image_pca(image_bytes: bytes, k: int) -> dict:
     if k < 1:
         raise ValueError("Components must be greater than or equal to 1.")
