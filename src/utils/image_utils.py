@@ -1,11 +1,16 @@
 from fastapi import HTTPException
+from pathlib import Path
 
-def validate_image_file(filename: str) -> None:
-    allowed_extensions = {".jpg", ".jpeg", ".png", ".webp"}
+ALLOWED_IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
+
+
+def validate_image_file(filename: str | None) -> None:
+    if not filename:
+        raise HTTPException(status_code=400, detail="Image filename is required.")
     
-    # Cek apakah ekstensi file valid
-    if not any(filename.lower().endswith(ext) for ext in allowed_extensions):
+    extension = Path(filename).suffix.lower()
+    if extension not in ALLOWED_IMAGE_EXTENSIONS:
         raise HTTPException(
             status_code=400, 
-            detail=f"Format not supported. Allowed formats: {', '.join(allowed_extensions)}"
+            detail=f"Format not supported. Allowed formats: {', '.join(sorted(ALLOWED_IMAGE_EXTENSIONS))}."
         )

@@ -15,6 +15,8 @@ async def compress_image(
         
         # Baca file
         image_bytes = await image.read()
+        if not image_bytes:
+            raise HTTPException(status_code=400, detail="Uploaded image is empty.")
         
         # Proses kompresi
         result = compress_image_pca(image_bytes, k=components)
@@ -22,6 +24,10 @@ async def compress_image(
         return result
         
     except HTTPException as he:
-        raise he # 404 Bad Request
+        raise he
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve)) from ve
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Failed to compress image.") from e
+    finally:
+        await image.close()

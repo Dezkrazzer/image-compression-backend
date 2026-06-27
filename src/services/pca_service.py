@@ -1,45 +1,56 @@
 import numpy as np
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 import io
 import time
 import base64
+import torch
+
+# Deteksi hardware secara dinamis: CUDA (NVIDIA), MPS (Apple Silicon), atau CPU (Multicore x86/AMD)
+device = torch.device('cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu')
 
 def compress_image_pca(image_bytes: bytes, k: int) -> dict:
+    if k < 1:
+        raise ValueError("Components must be greater than or equal to 1.")
+
     start_time = time.time()
     
-    # Buka gambar menggunakan Pillow dan konversi ke RGB (berupa matriks 3D)
-    img = Image.open(io.BytesIO(image_bytes)).convert('RGB')
+    try:
+        # Buka gambar menggunakan Pillow dan konversi ke RGB
+        with Image.open(io.BytesIO(image_bytes)) as source_img:
+            img = source_img.convert('RGB')
+    except UnidentifiedImageError as exc:
+        raise ValueError("Uploaded file is not a valid image.") from exc
+
     img_array = np.array(img)
+    h, w, c = img_array.shape
     
-    # Pisahkan channel warna Red, Green, Blue
-    R = img_array[:, :, 0]
-    G = img_array[:, :, 1]
-    B = img_array[:, :, 2]
-    
-    # Batasi nilai k (komponen PCA) agar tidak melebihi dimensi gambar
-    max_k = min(R.shape)
+    # Batasi nilai k agar tidak melebihi dimensi gambar terkecil
+    max_k = min(h, w)
     k = min(k, max_k)
     
-    def compress_channel(channel_matrix, components):
-        # Dekomposisi matriks menggunakan SVD (Singular Value Decomposition)
-        U, S, Vt = np.linalg.svd(channel_matrix, full_matrices=False)
-        
-        # Rekonstruksi matriks hanya menggunakan sejumlah komponen k
-        reconstructed = np.dot(U[:, :components], np.dot(np.diag(S[:components]), Vt[:components, :]))
-        return reconstructed
-
-    # Terapkan PCA pada masing-masing matriks warna
-    R_compressed = compress_channel(R, k)
-    G_compressed = compress_channel(G, k)
-    B_compressed = compress_channel(B, k)
+    # 1. Pindahkan data ke PyTorch Tensor dan arahkan ke device yang tersedia
+    # 2. Ubah urutan dimensi dari (H, W, C) menjadi (C, H, W) agar siap untuk Batched SVD
+    tensor_img = torch.tensor(img_array, dtype=torch.float32, device=device).permute(2, 0, 1)
     
-    # Gabungkan kembali ketiga channel warna tersebut
-    compressed_array = np.dstack((R_compressed, G_compressed, B_compressed))
+    # Eksekusi SVD secara paralel untuk ketiga channel (R, G, B) sekaligus tanpa perulangan
+    U, S, Vh = torch.linalg.svd(tensor_img, full_matrices=False)
     
-    # Pastikan nilai pixel tetap dalam rentang valid 0-255
+    # Slicing untuk mengambil sejumlah komponen k yang diminta
+    U_k = U[..., :k]
+    S_k = S[..., :k]
+    Vh_k = Vh[..., :k, :]
+    
+    # Rekonstruksi gambar
+    # torch.diag_embed mengubah vektor 1D S menjadi matriks diagonal untuk perkalian matriks
+    reconstructed_tensor = U_k @ torch.diag_embed(S_k) @ Vh_k
+    
+    # Kembalikan ke format awal (H, W, C), tarik memori kembali ke CPU, dan konversi ke NumPy
+    compressed_array = reconstructed_tensor.permute(1, 2, 0).cpu().numpy()
+    
+    # Pastikan nilai pixel tetap dalam rentang valid 0-255 dan ubah tipe data
     compressed_array = np.clip(compressed_array, 0, 255).astype(np.uint8)
     
-    # Hitung perbedaan pixel
+    # Hitung perbedaan pixel untuk evaluasi loss
     diff = np.abs(img_array.astype(np.float32) - compressed_array.astype(np.float32))
     pixel_diff_percentage = float((np.sum(diff) / (img_array.size * 255.0)) * 100)
     
@@ -51,12 +62,15 @@ def compress_image_pca(image_bytes: bytes, k: int) -> dict:
     
     process_time = time.time() - start_time
     
-    # Ubah gambar ke format Base64
+    # Ubah gambar ke format Base64 untuk dikirim via JSON response
     compressed_b64 = base64.b64encode(compressed_bytes).decode('utf-8')
     
     return {
         "compressed_image": compressed_b64,
         "compressed_size": len(compressed_bytes),
+        "original_size": len(image_bytes),
+        "components_used": k,
         "process_time": process_time,
-        "pixel_difference": float(pixel_diff_percentage)
+        "pixel_difference": float(pixel_diff_percentage),
+        "compute_device": str(device) # Menambahkan info device agar kelihatan di respon API
     }
