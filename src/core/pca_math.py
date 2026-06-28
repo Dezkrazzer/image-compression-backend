@@ -6,9 +6,7 @@ import torch
 from .device import DEVICE
 
 
-# --------------------------------------------------------
 # NumPy -> Tensor
-# --------------------------------------------------------
 
 def numpy_batch_to_tensor(
     images: list[np.ndarray],
@@ -51,9 +49,7 @@ def numpy_batch_to_tensor(
     )
 
 
-# --------------------------------------------------------
 # Tensor -> NumPy
-# --------------------------------------------------------
 
 def tensor_batch_to_numpy(
     tensor: torch.Tensor,
@@ -83,10 +79,7 @@ def tensor_batch_to_numpy(
 
     ]
 
-
-# --------------------------------------------------------
 # Batched PCA
-# --------------------------------------------------------
 
 def run_batch_pca(
     batch: torch.Tensor,
@@ -151,10 +144,7 @@ def run_batch_pca(
 
         return reconstructed,pixel_diff
 
-
-# --------------------------------------------------------
 # Cleanup
-# --------------------------------------------------------
 
 def cleanup():
 
