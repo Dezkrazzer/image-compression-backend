@@ -330,16 +330,13 @@ Komputasi matematika paralel PyTorch akan berjalan optimal jika data dikirimkan 
 
 ## 👥 Anggota Kelompok
 
-Proyek ini disusun dan dikembangkan oleh Kelompok:
+| Nama Lengkap | NIM | Peran Utama | Tautan Profil |
+| :---: | :--- | :---: | :--- |
+| **Lazuardi Akbar Imani** | L0125105 | Frontend Developer | [🌐 GitHub](https://github.com/Dezkrazzer) • [💼 LinkedIn](https://www.linkedin.com/in/lazuardiakbar/) |
+| **Muhammad Haidar Ramzy** | L0125109 | Backend Developer | [🌐 GitHub](https://github.com/AiChan277) • [💼 LinkedIn](https://www.linkedin.com/in/muhammad-haidar-ramzy/) |
+| **Egifrid Angelo Mwoleka** | L0125096 | UI/UX Designer | [🌐 GitHub](https://github.com/mweyunge) • [💼 LinkedIn](https://www.linkedin.com/in/egifrid-mwoleka-5b2a581b5/) |
 
-| No | Nama Lengkap | NIM | Peran / Kontribusi |
-| :--- | :--- | :--- | :--- |
-| 1 | [Nama Anggota 1] | [NIM Anggota 1] | Developer Backend, Implementasi Math & SVD |
-| 2 | [Nama Anggota 2] | [NIM Anggota 2] | Integrasi FastAPI, Validasi File, & Pengujian |
-| 3 | [Nama Anggota 3] | [NIM Anggota 3] | Desain Mesin Tiling & Optimalisasi Memori |
-| 4 | [Nama Anggota 4] | [NIM Anggota 4] | Dokumentasi API & Penyusunan Laporan |
-
-*(Silakan sesuaikan data anggota kelompok di atas sesuai dengan informasi kelompok Anda).*
-
----
-Dokumentasi ini dibuat untuk mempermudah pemahaman arsitektur backend, instalasi sistem, dan integrasi API. Jika Anda memiliki pertanyaan lebih lanjut, silakan hubungi tim pengembang proyek.
+<p align="center" style="margin-top: 20px;">
+  <strong>Program Studi Informatika • Fakultas Teknologi Informasi dan Sains Data</strong><br />
+  <strong>Universitas Sebelas Maret (UNS)</strong>
+</p>
