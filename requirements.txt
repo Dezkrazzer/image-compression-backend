@@ -3,10 +3,14 @@ uvicorn[standard]>=0.35.0
 python-multipart>=0.0.20
 
 numpy>=2.3.0
+
+# Wajib untuk Pelican: Mengambil versi CPU agar server tidak kehabisan memori
+--extra-index-url https://download.pytorch.org/whl/cpu
 torch>=2.8.0
 
 Pillow>=11.3.0
 rawpy>=0.25.1
 pillow-heif>=1.1.0
 
-opencv-python>=4.12.0
+# Wajib untuk Pelican: Menggunakan versi Headless (tanpa GUI) untuk server Linux
+opencv-python-headless>=4.12.0
