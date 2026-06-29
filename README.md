@@ -2,7 +2,7 @@
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com)
 [![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)](https://pytorch.org)
-[![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org)
+[![Python](https://img.shields.io/badge/Python-3.12+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org)
 
 Backend API berbasis FastAPI yang kuat dan berkinerja tinggi untuk mengompresi gambar menggunakan metode **Principal Component Analysis (PCA)**. Dilengkapi dengan mesin pemrosesan ubin adaptif (*adaptive tile-based engine*) untuk menangani gambar beresolusi sangat besar tanpa mengalami kehabisan memori (*Out Of Memory*), serta mendukung akselerasi otomatis perangkat keras (CPU, CUDA GPU, dan Apple Silicon MPS).
 
@@ -166,7 +166,7 @@ Proses kompresi gambar pada sistem ini berjalan melalui tahapan terstruktur beri
 ## 🚀 Instalasi & Menjalankan
 
 ### Prasyarat Sistem
-* **Python**: Versi `3.10` atau yang lebih baru.
+* **Python**: Versi `3.12` atau yang lebih baru.
 * **RAM**: Minimal `8 GB` (Direkomendasikan `16 GB` untuk pemrosesan gambar resolusi ultra tinggi).
 * **GPU**: GPU NVIDIA berkemampuan CUDA (Opsional, untuk akselerasi).
 
